@@ -1,12 +1,12 @@
 // Inicjalizacja Firebase
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDgP-MDJZ7Ma7QegDetUU_A2kzuvKahiMA",
+    authDomain: "studioglos-9d977.firebaseapp.com",
+    databaseURL: "https://studioglos-9d977-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "studioglos-9d977",
+    storageBucket: "studioglos-9d977.firebasestorage.app",
+    messagingSenderId: "621038569234",
+    appId: "1:621038569234:web:55685f1419d15751de55cb"
 };
 
 const app = firebase.initializeApp(firebaseConfig);
