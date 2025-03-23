@@ -24,7 +24,7 @@
         <button class="btn-green" onclick="vote('za')">ZA</button>
         <button class="btn-red" onclick="vote('przeciw')">PRZECIW</button>
         <button class="btn-gray" onclick="vote('wstrzymuje')">WSTRZYMUJĘ SIĘ</button>
-        <p id="results" style="display: none;"></p> <!-- Ukryj wyniki, dopóki głosowanie nie jest zakończone -->
+        <p id="results" style="display: none;"></p>
         <button class="btn-blue" onclick="logout()">Wyloguj</button>
     </div>
 
@@ -39,6 +39,10 @@
         <p id="timer-display">Pozostały czas: 0 sek.</p>
         <button class="btn-blue" onclick="logout()">Wyloguj</button>
     </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js"></script>
 
     <script src="script.js"></script>
 </body>
