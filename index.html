@@ -4,43 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Głosowania</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div id="login-container" class="container">
+        <h2>Login</h2>
+        <input type="text" id="login" placeholder="Login" required>
+        <input type="password" id="password" placeholder="Hasło" required>
+        <button onclick="login()">Zaloguj</button>
+        <div id="error-message"></div>
+    </div>
+
+    <div id="voting-container" class="container" style="display: none;">
+        <h2>Zalogowano jako: <span id="user-name"></span></h2>
+        <button id="vote-za" onclick="vote('ZA')">ZA</button>
+        <button id="vote-przeciw" onclick="vote('PRZECIW')">PRZECIW</button>
+        <button id="vote-wstrzymaj" onclick="vote('WSTRZYMAJ_SIE')">WSTRZYMAJ SIĘ</button>
+        <button id="logout-btn" onclick="logout()">Wyloguj</button>
+    </div>
+
+    <div id="admin-container" class="container" style="display: none;">
+        <h2>Prowadzący - Panel Admina</h2>
+        <button onclick="startVoting()">Rozpocznij głosowanie</button>
+        <button onclick="endVoting()">Zakończ głosowanie</button>
+        <div id="results"></div>
+        <div id="timer"></div>
+        <div id="countdown" class="countdown"></div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js"></script>
-</head>
-<body>
-    <!-- Ekran logowania -->
-    <div id="login-screen">
-        <h1>Login</h1>
-        <input type="text" id="login" placeholder="Login">
-        <input type="password" id="password" placeholder="Hasło">
-        <button onclick="login()">Zaloguj</button>
-        <p id="error-msg" style="color:red;"></p>
-    </div>
-
-    <!-- Ekran głosowania -->
-    <div id="main-screen" style="display:none;">
-        <h2>Witaj <span id="user-name"></span>!</h2>
-        <h3>Wybierz jedną z opcji:</h3>
-        <button onclick="vote('ZA')">ZA</button>
-        <button onclick="vote('PRZECIW')">PRZECIW</button>
-        <button onclick="vote('WSTRZYMAJ SIE')">WSTRZYMAJ SIĘ</button>
-        <br><br>
-        <button onclick="logout()">Wyloguj</button>
-    </div>
-
-    <!-- Ekran administratora -->
-    <div id="admin-screen" style="display:none;">
-        <h2>Prowadzący</h2>
-        <button onclick="startVoting()">Rozpocznij głosowanie</button>
-        <button onclick="endVoting()">Zakończ głosowanie</button>
-        <button onclick="showResults()">Pokaż wyniki</button>
-        <br><br>
-        <button onclick="logout()">Wyloguj</button>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
