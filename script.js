@@ -1,4 +1,4 @@
-// Konfiguracja Firebase
+// Inicjalizacja Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDgP-MDJZ7Ma7QegDetUU_A2kzuvKahiMA",
     authDomain: "studioglos-9d977.firebaseapp.com",
@@ -11,94 +11,100 @@ const firebaseConfig = {
 };
 
 // Inicjalizacja Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-let loggedInUser = null;
+// Zmienne globalne
+let currentUser = null;
+let isVotingActive = false;
+let timer = null;
 
 // Funkcja logowania
 function login() {
-    const login = document.getElementById("login").value;
-    const password = document.getElementById("password").value;
-
-    // Sprawdzamy, czy użytkownik istnieje w bazie danych
-    firebase.database().ref('users/' + login).once('value').then(snapshot => {
+    const login = document.getElementById('login').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+    
+    db.ref('users/' + login).once('value').then((snapshot) => {
         const user = snapshot.val();
         if (user && user.password === password) {
-            loggedInUser = user;
-            sessionStorage.setItem("loggedInUser", JSON.stringify(user));
-            showScreen();
+            currentUser = user;
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('voting-container').style.display = 'block';
+            document.getElementById('user-name').textContent = currentUser.name;
+            if (user.role === 'admin') {
+                document.getElementById('admin-container').style.display = 'block';
+            }
         } else {
-            document.getElementById("error-msg").innerText = "Błędny login lub hasło!";
+            errorMessage.textContent = 'Błędny login lub hasło';
+            errorMessage.style.color = 'red';
         }
     });
 }
 
-// Funkcja wyświetlania ekranu po zalogowaniu
-function showScreen() {
-    if (loggedInUser.role === "admin") {
-        document.getElementById("admin-screen").style.display = "block";
-    } else {
-        document.getElementById("main-screen").style.display = "block";
-        document.getElementById("user-name").textContent = loggedInUser.name;
-    }
-    document.getElementById("login-screen").style.display = "none";
-}
-
-// Funkcja wylogowywania
+// Funkcja wylogowania
 function logout() {
-    loggedInUser = null;
-    sessionStorage.removeItem("loggedInUser");
-    document.getElementById("main-screen").style.display = "none";
-    document.getElementById("admin-screen").style.display = "none";
-    document.getElementById("login-screen").style.display = "block";
+    currentUser = null;
+    document.getElementById('login-container').style.display = 'block';
+    document.getElementById('voting-container').style.display = 'none';
+    document.getElementById('admin-container').style.display = 'none';
+    document.getElementById('error-message').textContent = '';
 }
 
-// Funkcja głosowania
+// Funkcja do głosowania
 function vote(choice) {
-    const userId = loggedInUser.name;
-    const voteRef = database.ref('votes/' + userId);
-    voteRef.set({
-        vote: choice
+    if (!isVotingActive) return;
+    db.ref('votes/' + choice).transaction((currentVote) => {
+        return (currentVote || 0) + 1;
     });
-
-    alert("Twój głos został oddany: " + choice);
 }
 
-// Funkcja rozpoczęcia głosowania
+// Funkcja rozpoczęcia głosowania (admin)
 function startVoting() {
-    const votingStatusRef = database.ref('votingStatus');
-    votingStatusRef.set({
-        active: true
-    });
-    alert("Głosowanie rozpoczęte!");
+    isVotingActive = true;
+    document.getElementById('results').textContent = 'Głosowanie aktywne!';
+    startTimer();
 }
 
-// Funkcja zakończenia głosowania
+// Funkcja zakończenia głosowania (admin)
 function endVoting() {
-    const votingStatusRef = database.ref('votingStatus');
-    votingStatusRef.set({
-        active: false
-    });
-    alert("Głosowanie zakończone!");
+    isVotingActive = false;
+    document.getElementById('results').textContent = 'Głosowanie zakończone!';
+    clearInterval(timer);
+    showResults();
 }
 
 // Funkcja wyświetlania wyników
 function showResults() {
-    const votesRef = database.ref('votes');
-    votesRef.once('value', snapshot => {
-        const votes = snapshot.val();
-        const results = { ZA: 0, PRZECIW: 0, WSTRZYMAJ_SIE: 0 };
-
-        for (const user in votes) {
-            if (votes[user].vote === "ZA") {
-                results.ZA++;
-            } else if (votes[user].vote === "PRZECIW") {
-                results.PRZECIW++;
-            } else if (votes[user].vote === "WSTRZYMAJ SIE") {
-                results.WSTRZYMAJ_SIE++;
-            }
-        }
-        alert(`Wyniki głosowania:\nZA: ${results.ZA}\nPRZECIW: ${results.PRZECIW}\nWSTRZYMAJ SIĘ: ${results.WSTRZYMAJ_SIE}`);
+    db.ref('votes').once('value').then((snapshot) => {
+        const votes = snapshot.val() || {};
+        const za = votes.ZA || 0;
+        const przeciw = votes.PRZECIW || 0;
+        const wstrzymaj = votes.WSTRZYMAJ_SIE || 0;
+        document.getElementById('results').innerHTML = `
+            ZA: ${za}<br>
+            PRZECIW: ${przeciw}<br>
+            WSTRZYMAJ SIĘ: ${wstrzymaj}
+        `;
     });
+}
+
+// Funkcja odliczania czasu
+function startTimer() {
+    let timeLeft = 30; // 30 sekund
+    const countdownElement = document.getElementById('countdown');
+
+    timer = setInterval(() => {
+        timeLeft--;
+        countdownElement.textContent = timeLeft + 's';
+        
+        if (timeLeft <= 5) {
+            countdownElement.style.color = 'red';
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            endVoting();
+        }
+    }, 1000);
 }
