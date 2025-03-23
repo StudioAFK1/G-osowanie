@@ -5,44 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Głosowania</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
 </head>
 <body>
-
-    <!-- Ekran logowania -->
-    <div id="login-screen" class="container">
-        <h2>Login</h2>
-        <input type="text" id="login" placeholder="Login" />
-        <input type="password" id="password" placeholder="Hasło" />
-        <button class="btn-blue" onclick="login()">Zaloguj się</button>
+    <div id="login-screen">
+        <h1>Logowanie</h1>
+        <input type="text" id="login" placeholder="Login" required>
+        <input type="password" id="password" placeholder="Hasło" required>
+        <button onclick="login()">Zaloguj</button>
         <p id="error-msg" style="color: red;"></p>
     </div>
 
-    <!-- Ekran głosowania użytkownika -->
-    <div id="vote-screen" class="container hidden">
-        <h2>Witaj, <span id="username"></span></h2>
-        <p id="vote-status">Głosowanie nie jest aktywne</p>
-        <button class="btn-green" onclick="vote('za')">ZA</button>
-        <button class="btn-red" onclick="vote('przeciw')">PRZECIW</button>
-        <button class="btn-gray" onclick="vote('wstrzymuje')">WSTRZYMUJĘ SIĘ</button>
-        <p id="results" style="display: none;"></p>
-        <button class="btn-blue" onclick="logout()">Wyloguj</button>
+    <div id="main-screen" style="display: none;">
+        <h2>Witaj, <span id="user-name"></span>!</h2>
+        <div id="vote-buttons">
+            <button id="vote-za" onclick="vote('ZA')">ZA</button>
+            <button id="vote-przeciw" onclick="vote('PRZECIW')">PRZECIW</button>
+            <button id="vote-wstrzymuje" onclick="vote('WSTRZYMAJ SIE')">WSTRZYMAJ SIĘ</button>
+        </div>
+        <button id="logout-btn" onclick="logout()">Wyloguj</button>
     </div>
 
-    <!-- Ekran dla administratora -->
-    <div id="admin-screen" class="container hidden">
-        <h2>Witaj, Prowadzący</h2>
-        <button class="btn-green" onclick="startVoting()">Rozpocznij głosowanie</button>
-        <button class="btn-red" onclick="endVoting()">Zakończ głosowanie</button>
-        <button class="btn-orange" onclick="showResults()">Pokaż wyniki</button>
-        <input id="timer-input" type="number" placeholder="Czas w sekundach" />
-        <button class="btn-blue" onclick="startTimer()">Ustaw czas</button>
-        <p id="timer-display">Pozostały czas: 0 sek.</p>
-        <button class="btn-blue" onclick="logout()">Wyloguj</button>
+    <div id="admin-screen" style="display: none;">
+        <h2>Panel Administratora</h2>
+        <button onclick="startVoting()">Rozpocznij Głosowanie</button>
+        <button onclick="endVoting()">Zakończ Głosowanie</button>
+        <button onclick="showResults()">Pokaż Wyniki</button>
+        <p id="time-display"></p>
     </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js"></script>
 
     <script src="script.js"></script>
 </body>
