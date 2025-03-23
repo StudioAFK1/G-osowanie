@@ -1,4 +1,4 @@
-// Inicjalizacja Firebase
+// Konfiguracja Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDgP-MDJZ7Ma7QegDetUU_A2kzuvKahiMA",
     authDomain: "studioglos-9d977.firebaseapp.com",
@@ -6,36 +6,24 @@ const firebaseConfig = {
     projectId: "studioglos-9d977",
     storageBucket: "studioglos-9d977.firebasestorage.app",
     messagingSenderId: "621038569234",
-    appId: "1:621038569234:web:55685f1419d15751de55cb"
+    appId: "1:621038569234:web:55685f1419d15751de55cb",
+    measurementId: "G-J5CTKWVL7R"
 };
 
+// Inicjalizacja Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-let loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser")) || null;
-let votes = { za: 0, przeciw: 0, wstrzymuje: 0 };
-let votingActive = false;
-let timer = 0;
-let timerRunning = false;
+let loggedInUser = null;
 
-// Logowanie użytkownika
+// Funkcja logowania
 function login() {
     const login = document.getElementById("login").value;
     const password = document.getElementById("password").value;
 
-    if (login === "admin" && password === "admin") {
-        loggedInUser = { name: "Prowadzący", role: "admin" };
-        sessionStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
-        showScreen();
-    } else {
-        // Użytkownicy
-        const users = {
-            "kowalski123": { password: "1111", name: "Jan Kowalski" },
-            "nowak456": { password: "2222", name: "Anna Nowak" },
-            "zielinski789": { password: "3333", name: "Piotr Zieliński" }
-        };
-
-        const user = users[login];
+    // Sprawdzamy, czy użytkownik istnieje w bazie danych
+    firebase.database().ref('users/' + login).once('value').then(snapshot => {
+        const user = snapshot.val();
         if (user && user.password === password) {
             loggedInUser = user;
             sessionStorage.setItem("loggedInUser", JSON.stringify(user));
@@ -43,83 +31,74 @@ function login() {
         } else {
             document.getElementById("error-msg").innerText = "Błędny login lub hasło!";
         }
-    }
+    });
 }
 
-// Pokaż odpowiedni ekran po zalogowaniu
+// Funkcja wyświetlania ekranu po zalogowaniu
 function showScreen() {
-    if (loggedInUser) {
-        document.getElementById("login-screen").classList.add("hidden");
-
-        if (loggedInUser.role === "admin") {
-            document.getElementById("admin-screen").classList.remove("hidden");
-        } else {
-            document.getElementById("vote-screen").classList.remove("hidden");
-            document.getElementById("username").innerText = loggedInUser.name;
-        }
+    if (loggedInUser.role === "admin") {
+        document.getElementById("admin-screen").style.display = "block";
+    } else {
+        document.getElementById("main-screen").style.display = "block";
+        document.getElementById("user-name").textContent = loggedInUser.name;
     }
+    document.getElementById("login-screen").style.display = "none";
 }
 
-// Głosowanie
-function vote(choice) {
-    if (!votingActive) {
-        document.getElementById("vote-status").innerText = "Głosowanie nie jest aktywne!";
-        return;
-    }
-
-    database.ref('votes').once('value').then(function(snapshot) {
-        let currentVotes = snapshot.val();
-        currentVotes[choice]++;
-        database.ref('votes').set(currentVotes);
-    });
-
-    document.getElementById("vote-status").innerText = `Oddano głos: ${choice.toUpperCase()}`;
-}
-
-// Rozpoczęcie głosowania
-function startVoting() {
-    votingActive = true;
-    votes = { za: 0, przeciw: 0, wstrzymuje: 0 };
-    database.ref('votes').set(votes);
-    database.ref('votingActive').set(votingActive);
-    updateVoteStatus();
-}
-
-// Zakończenie głosowania
-function endVoting() {
-    votingActive = false;
-    database.ref('votingActive').set(votingActive);
-    updateVoteStatus();
-    document.getElementById("results").style.display = "block";
-}
-
-// Pokaż wyniki
-function showResults() {
-    database.ref('votes').on('value', function(snapshot) {
-        const data = snapshot.val();
-        if (votingActive) {
-            document.getElementById("results").innerText = "Głosowanie nie zostało zakończone!";
-        } else {
-            document.getElementById("results").innerText =
-                `ZA: ${data.za}, PRZECIW: ${data.przeciw}, WSTRZYMUJĘ: ${data.wstrzymuje}`;
-        }
-    });
-}
-
-// Wylogowanie
+// Funkcja wylogowywania
 function logout() {
+    loggedInUser = null;
     sessionStorage.removeItem("loggedInUser");
-    location.reload();
+    document.getElementById("main-screen").style.display = "none";
+    document.getElementById("admin-screen").style.display = "none";
+    document.getElementById("login-screen").style.display = "block";
 }
 
-// Aktualizowanie statusu głosowania
-function updateVoteStatus() {
-    database.ref('votingActive').on('value', function(snapshot) {
-        votingActive = snapshot.val();
-        if (votingActive) {
-            document.getElementById("vote-status").innerText = "Głosowanie aktywne!";
-        } else {
-            document.getElementById("vote-status").innerText = "Głosowanie zakończone!";
+// Funkcja głosowania
+function vote(choice) {
+    const userId = loggedInUser.name;
+    const voteRef = database.ref('votes/' + userId);
+    voteRef.set({
+        vote: choice
+    });
+
+    alert("Twój głos został oddany: " + choice);
+}
+
+// Funkcja rozpoczęcia głosowania
+function startVoting() {
+    const votingStatusRef = database.ref('votingStatus');
+    votingStatusRef.set({
+        active: true
+    });
+    alert("Głosowanie rozpoczęte!");
+}
+
+// Funkcja zakończenia głosowania
+function endVoting() {
+    const votingStatusRef = database.ref('votingStatus');
+    votingStatusRef.set({
+        active: false
+    });
+    alert("Głosowanie zakończone!");
+}
+
+// Funkcja wyświetlania wyników
+function showResults() {
+    const votesRef = database.ref('votes');
+    votesRef.once('value', snapshot => {
+        const votes = snapshot.val();
+        const results = { ZA: 0, PRZECIW: 0, WSTRZYMAJ_SIE: 0 };
+
+        for (const user in votes) {
+            if (votes[user].vote === "ZA") {
+                results.ZA++;
+            } else if (votes[user].vote === "PRZECIW") {
+                results.PRZECIW++;
+            } else if (votes[user].vote === "WSTRZYMAJ SIE") {
+                results.WSTRZYMAJ_SIE++;
+            }
         }
+        alert(`Wyniki głosowania:\nZA: ${results.ZA}\nPRZECIW: ${results.PRZECIW}\nWSTRZYMAJ SIĘ: ${results.WSTRZYMAJ_SIE}`);
     });
 }
