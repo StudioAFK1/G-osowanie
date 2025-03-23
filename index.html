@@ -5,34 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Głosowania</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js"></script>
 </head>
 <body>
+    <!-- Ekran logowania -->
     <div id="login-screen">
-        <h1>Logowanie</h1>
-        <input type="text" id="login" placeholder="Login" required>
-        <input type="password" id="password" placeholder="Hasło" required>
+        <h1>Login</h1>
+        <input type="text" id="login" placeholder="Login">
+        <input type="password" id="password" placeholder="Hasło">
         <button onclick="login()">Zaloguj</button>
-        <p id="error-msg" style="color: red;"></p>
+        <p id="error-msg" style="color:red;"></p>
     </div>
 
-    <div id="main-screen" style="display: none;">
-        <h2>Witaj, <span id="user-name"></span>!</h2>
-        <div id="vote-buttons">
-            <button id="vote-za" onclick="vote('ZA')">ZA</button>
-            <button id="vote-przeciw" onclick="vote('PRZECIW')">PRZECIW</button>
-            <button id="vote-wstrzymuje" onclick="vote('WSTRZYMAJ SIE')">WSTRZYMAJ SIĘ</button>
-        </div>
-        <button id="logout-btn" onclick="logout()">Wyloguj</button>
+    <!-- Ekran głosowania -->
+    <div id="main-screen" style="display:none;">
+        <h2>Witaj <span id="user-name"></span>!</h2>
+        <h3>Wybierz jedną z opcji:</h3>
+        <button onclick="vote('ZA')">ZA</button>
+        <button onclick="vote('PRZECIW')">PRZECIW</button>
+        <button onclick="vote('WSTRZYMAJ SIE')">WSTRZYMAJ SIĘ</button>
+        <br><br>
+        <button onclick="logout()">Wyloguj</button>
     </div>
 
-    <div id="admin-screen" style="display: none;">
-        <h2>Panel Administratora</h2>
-        <button onclick="startVoting()">Rozpocznij Głosowanie</button>
-        <button onclick="endVoting()">Zakończ Głosowanie</button>
-        <button onclick="showResults()">Pokaż Wyniki</button>
-        <p id="time-display"></p>
+    <!-- Ekran administratora -->
+    <div id="admin-screen" style="display:none;">
+        <h2>Prowadzący</h2>
+        <button onclick="startVoting()">Rozpocznij głosowanie</button>
+        <button onclick="endVoting()">Zakończ głosowanie</button>
+        <button onclick="showResults()">Pokaż wyniki</button>
+        <br><br>
+        <button onclick="logout()">Wyloguj</button>
     </div>
 
     <script src="script.js"></script>
