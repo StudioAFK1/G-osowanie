@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Głosowania</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Ekran logowania -->
+    <div id="login-screen" class="container">
+        <h2>Login</h2>
+        <input type="text" id="login" placeholder="Login" />
+        <input type="password" id="password" placeholder="Hasło" />
+        <button class="btn-blue" onclick="login()">Zaloguj się</button>
+        <p id="error-msg" style="color: red;"></p>
+    </div>
+
+    <!-- Ekran głosowania użytkownika -->
+    <div id="vote-screen" class="container hidden">
+        <h2>Witaj, <span id="username"></span></h2>
+        <p id="vote-status">Głosowanie nie jest aktywne</p>
+        <button class="btn-green" onclick="vote('za')">ZA</button>
+        <button class="btn-red" onclick="vote('przeciw')">PRZECIW</button>
+        <button class="btn-gray" onclick="vote('wstrzymuje')">WSTRZYMUJĘ SIĘ</button>
+        <p id="results" style="display: none;"></p> <!-- Ukryj wyniki, dopóki głosowanie nie jest zakończone -->
+        <button class="btn-blue" onclick="logout()">Wyloguj</button>
+    </div>
+
+    <!-- Ekran dla administratora -->
+    <div id="admin-screen" class="container hidden">
+        <h2>Witaj, Prowadzący</h2>
+        <button class="btn-green" onclick="startVoting()">Rozpocznij głosowanie</button>
+        <button class="btn-red" onclick="endVoting()">Zakończ głosowanie</button>
+        <button class="btn-orange" onclick="showResults()">Pokaż wyniki</button>
+        <input id="timer-input" type="number" placeholder="Czas w sekundach" />
+        <button class="btn-blue" onclick="startTimer()">Ustaw czas</button>
+        <p id="timer-display">Pozostały czas: 0 sek.</p>
+        <button class="btn-blue" onclick="logout()">Wyloguj</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
